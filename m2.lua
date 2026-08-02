@@ -1,7 +1,7 @@
 -- ============================================
 -- FULL SCRIPT – UNDERGROUND AUTOFARM + ESP + SHERIFF + MURDERER + MISC
 -- WITH WORKING SHOOT MURDERER, PLAYER LIST FLING, AND TELEPORTS
--- UPDATED: Fixed teleports, added fly with slider, restored fling, updated tag
+-- UPDATED: Fixed teleports (no more "no map found"), removed color section from misc
 -- ============================================
 
 -- SERVICES
@@ -927,6 +927,9 @@ local function getMap()
         if obj:FindFirstChild("CoinContainer") and obj:FindFirstChild("Spawns") then
             return obj
         end
+        if obj:FindFirstChild("CoinAreas") then
+            return obj
+        end
     end
     return nil
 end
@@ -974,7 +977,18 @@ local function TeleportToMap()
 
     local map = getMap()
     if not map then 
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Map not found!", Duration=2, Icon="warning"}) end
+        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Map not found! Trying to find spawn...", Duration=2, Icon="warning"}) end
+        -- Try to find any spawn point in workspace
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and (obj.Name:lower():find("spawn") or obj.Name:lower():find("start")) then
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    hrp.CFrame = obj.CFrame * CFrame.new(0, 3, 0)
+                    if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Teleported to spawn point!", Duration=2, Icon="check"}) end
+                    return
+                end
+            end
+        end
         return 
     end
 
@@ -1030,7 +1044,7 @@ local function TeleportToLobby()
 
     local spawns = lobby:FindFirstChild("Spawns") or lobby:FindFirstChild("LobbySpawns")
     if not spawns then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Spawns not found!", Duration=2, Icon="warning"}) end
+        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Spawns not found in lobby!", Duration=2, Icon="warning"}) end
         return
     end
 
@@ -1173,11 +1187,9 @@ end)
 -- ============================================
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-local currentThemeColor = Color3.fromRGB(0, 255, 0)
-
 WindUI:AddTheme({
     Name="Black Theme", 
-    Accent=currentThemeColor, 
+    Accent=Color3.fromRGB(0, 255, 0), 
     Background=Color3.fromHex("#000000"),
     Outline=Color3.fromHex("#1a1a1a"), 
     Text=Color3.fromHex("#ffffff"),
@@ -1552,7 +1564,7 @@ MurdererTab:Keybind({Title="Murderer Keybind", Value="K",
 -- ============================================
 local MiscTab = Window:Tab({Title="Misc", Icon="more-horizontal"})
 
--- FLING SECTION - RESTORED
+-- FLING SECTION
 local FlingSection = MiscTab:Section({ 
     Title = "Player Fling",
     Box = false,
@@ -1601,111 +1613,6 @@ FlingSection:Button({Title="💨 Fling All", Desc="Fling all players in the serv
             }) 
         end
     end})
-
--- UI Color Customization (Compact)
-local ColorSection = MiscTab:Section({ 
-    Title = "UI Color Settings",
-    Box = false,
-    TextXAlignment = "Left",
-    Opened = true,
-})
-
-ColorSection:Colorpicker({
-    Title = "Accent Color",
-    Desc = "Changes the UI accent color",
-    Default = Color3.fromRGB(0, 255, 0),
-    Transparency = 0,
-    Locked = false,
-    Callback = function(color)
-        currentThemeColor = color
-        WindUI:AddTheme({
-            Name="Black Theme", 
-            Accent=color, 
-            Background=Color3.fromHex("#000000"),
-            Outline=Color3.fromHex("#1a1a1a"), 
-            Text=Color3.fromHex("#ffffff"),
-            Placeholder=Color3.fromHex("#4d4d4d"), 
-            Button=Color3.fromHex("#0a0a0a"), 
-            Icon=Color3.fromHex("#808080"),
-        })
-        Window:SetTheme("Black Theme")
-    end
-})
-
-ColorSection:Colorpicker({
-    Title = "Button Color",
-    Desc = "Changes the button background color",
-    Default = Color3.fromRGB(10, 10, 10),
-    Transparency = 0,
-    Locked = false,
-    Callback = function(color)
-        WindUI:AddTheme({
-            Name="Black Theme", 
-            Accent=currentThemeColor, 
-            Background=Color3.fromHex("#000000"),
-            Outline=Color3.fromHex("#1a1a1a"), 
-            Text=Color3.fromHex("#ffffff"),
-            Placeholder=Color3.fromHex("#4d4d4d"), 
-            Button=color, 
-            Icon=Color3.fromHex("#808080"),
-        })
-        Window:SetTheme("Black Theme")
-    end
-})
-
-ColorSection:Colorpicker({
-    Title = "Text Color",
-    Desc = "Changes the text color",
-    Default = Color3.fromRGB(255, 255, 255),
-    Transparency = 0,
-    Locked = false,
-    Callback = function(color)
-        WindUI:AddTheme({
-            Name="Black Theme", 
-            Accent=currentThemeColor, 
-            Background=Color3.fromHex("#000000"),
-            Outline=Color3.fromHex("#1a1a1a"), 
-            Text=color, 
-            Placeholder=Color3.fromHex("#4d4d4d"), 
-            Button=Color3.fromHex("#0a0a0a"), 
-            Icon=Color3.fromHex("#808080"),
-        })
-        Window:SetTheme("Black Theme")
-    end
-})
-
-ColorSection:Colorpicker({
-    Title = "Background Color",
-    Desc = "Changes the window background color",
-    Default = Color3.fromRGB(0, 0, 0),
-    Transparency = 0.42,
-    Locked = false,
-    Callback = function(color)
-        Window:SetBackgroundColor(color)
-        Window:SetBackgroundTransparency(0.42)
-    end
-})
-
-ColorSection:Button({
-    Title = "🔄 Reset Colors",
-    Desc = "Reset all UI colors to default",
-    Callback = function()
-        currentThemeColor = Color3.fromRGB(0, 255, 0)
-        WindUI:AddTheme({
-            Name="Black Theme", 
-            Accent=Color3.fromRGB(0, 255, 0), 
-            Background=Color3.fromHex("#000000"),
-            Outline=Color3.fromHex("#1a1a1a"), 
-            Text=Color3.fromHex("#ffffff"),
-            Placeholder=Color3.fromHex("#4d4d4d"), 
-            Button=Color3.fromHex("#0a0a0a"), 
-            Icon=Color3.fromHex("#808080"),
-        })
-        Window:SetTheme("Black Theme")
-        Window:SetBackgroundColor(Color3.fromRGB(0, 0, 0))
-        Window:SetBackgroundTransparency(0.42)
-    end
-})
 
 -- ============================================
 -- SELECT FIRST TAB
