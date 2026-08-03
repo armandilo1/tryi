@@ -1,3 +1,9 @@
+-- ============================================
+-- FULL SCRIPT – UNDERGROUND AUTOFARM + ESP + SHERIFF + MURDERER + MISC
+-- WITH WORKING SHOOT MURDERER, PLAYER LIST FLING, AND TELEPORTS
+-- FIXED: All errors wrapped in pcall for stability
+-- ============================================
+
 -- SERVICES
 local Players           = game:GetService("Players")
 local TweenService      = game:GetService("TweenService")
@@ -1506,12 +1512,7 @@ if TeleportsTab then
             else
                 if WindUI then 
                     pcall(function()
-                        WindUI:Notify({
-                            Title="FurqwkScripts", 
-                            Content="No murderer found!", 
-                            Duration=2, 
-                            Icon="warning"
-                        })
+                        WindUI:Notify({Title="FurqwkScripts", Content="No murderer found!", Duration=2, Icon="warning"})
                     end)
                 end
             end
@@ -1529,12 +1530,7 @@ if TeleportsTab then
             else
                 if WindUI then 
                     pcall(function()
-                        WindUI:Notify({
-                            Title="FurqwkScripts", 
-                            Content="No sheriff found!", 
-                            Duration=2, 
-                            Icon="warning"
-                        })
+                        WindUI:Notify({Title="FurqwkScripts", Content="No sheriff found!", Duration=2, Icon="warning"})
                     end)
                 end
             end
@@ -1636,14 +1632,14 @@ pcall(function()
 end)
 
 if MiscTab then
-    -- THEME DROPDOWN - WITH SAFE HANDLING
+    -- THEME DROPDOWN - CURRENT-STATE AWARE
     pcall(function()
         local themeNames = WindUI:GetThemes()
         if themeNames and #themeNames > 0 then
-            local ThemeDropdown = MiscTab:Dropdown({
-                Title = "Theme",
-                Values = themeNames,
-                Value = themeNames[1] or "Black Theme",
+            MiscTab:Dropdown({
+                Title    = "Theme",
+                Values   = themeNames,
+                Value    = WindUI:GetCurrentTheme(),
                 Callback = function(theme)
                     pcall(function()
                         WindUI:SetTheme(theme)
