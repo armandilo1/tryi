@@ -1,9 +1,3 @@
--- ============================================
--- FULL SCRIPT – UNDERGROUND AUTOFARM + ESP + SHERIFF + MURDERER + MISC
--- WITH WORKING SHOOT MURDERER, PLAYER LIST FLING, AND TELEPORTS
--- UPDATED: Fixed teleports (no more "no map found"), removed color section from misc
--- ============================================
-
 -- SERVICES
 local Players           = game:GetService("Players")
 local TweenService      = game:GetService("TweenService")
@@ -58,9 +52,11 @@ local flyspeedValue = 50
 -- ============================================
 -- CHARACTER RESET
 -- ============================================
-player.CharacterAdded:Connect(function(char)
-    character = char
-    rootPart  = char:WaitForChild("HumanoidRootPart")
+pcall(function()
+    player.CharacterAdded:Connect(function(char)
+        character = char
+        rootPart  = char:WaitForChild("HumanoidRootPart")
+    end)
 end)
 
 -- ============================================
@@ -283,8 +279,10 @@ local function updateESP()
     end
 end
 
-Players.PlayerRemoving:Connect(function(plr)
-    if espHighlights[plr] then espHighlights[plr]:Destroy(); espHighlights[plr] = nil end
+pcall(function()
+    Players.PlayerRemoving:Connect(function(plr)
+        if espHighlights[plr] then espHighlights[plr]:Destroy(); espHighlights[plr] = nil end
+    end)
 end)
 
 -- ============================================
@@ -471,10 +469,10 @@ local function grabGunManual()
     if gunBtn then
         if ok then
             gunBtn.flash("Got it!", Color3.fromRGB(0,255,100))
-            if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Gun grabbed!", Duration=2, Icon="check"}) end
+            if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Gun grabbed!", Duration=2, Icon="check"}) end) end
         else
             gunBtn.flash("No\nGun", Color3.fromRGB(255,80,80))
-            if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="No dropped gun found!", Duration=2, Icon="warning"}) end
+            if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="No dropped gun found!", Duration=2, Icon="warning"}) end) end
         end
     end
 end
@@ -515,7 +513,7 @@ end
 local function killAllWithTouch()
     local knife = getKnifeTool()
     if not knife then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="No knife found! You are not murderer!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="No knife found! You are not murderer!", Duration=2, Icon="warning"}) end) end
         return 0
     end
     
@@ -537,9 +535,9 @@ local function killAllPlayers()
     local killed = killAllWithTouch()
     if WindUI then 
         if killed > 0 then
-            WindUI:Notify({Title="FurqwkScripts", Content="Killed " .. killed .. " players with touch!", Duration=2, Icon="sword"})
+            pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Killed " .. killed .. " players with touch!", Duration=2, Icon="sword"}) end)
         else
-            WindUI:Notify({Title="FurqwkScripts", Content="No players killed! Make sure you have a knife.", Duration=2, Icon="warning"})
+            pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="No players killed! Make sure you have a knife.", Duration=2, Icon="warning"}) end)
         end
     end
     if killAllBtn then 
@@ -696,7 +694,7 @@ local function ShootMurderer()
                 pcall(function()
                     RemoteFunction:InvokeServer(1, PredictedPosition, "AH2")
                     if shootBtn then shootBtn.flash("Shot!", Color3.fromRGB(0,255,100)) end
-                    if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Shot fired at murderer!", Duration=2, Icon="check"}) end
+                    if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Shot fired at murderer!", Duration=2, Icon="check"}) end) end
                 end)
                 return
             end
@@ -708,7 +706,7 @@ local function ShootMurderer()
         pcall(function()
             ShootRemote:FireServer(CFrame.new(RightHand.Position), CFrame.new(PredictedPosition))
             if shootBtn then shootBtn.flash("Shot!", Color3.fromRGB(0,255,100)) end
-            if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Shot fired at murderer!", Duration=2, Icon="check"}) end
+            if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Shot fired at murderer!", Duration=2, Icon="check"}) end) end
         end)
         return
     end
@@ -731,10 +729,10 @@ local function ShootMurderer()
     
     if success then
         if shootBtn then shootBtn.flash("Shot!", Color3.fromRGB(0,255,100)) end
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Shot fired at murderer!", Duration=2, Icon="check"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Shot fired at murderer!", Duration=2, Icon="check"}) end) end
     else
         if shootBtn then shootBtn.flash("Failed", Color3.fromRGB(255,80,80)) end
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Failed to shoot!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Failed to shoot!", Duration=2, Icon="warning"}) end) end
     end
 end
 
@@ -959,32 +957,33 @@ local function TeleportToPlayer(target)
     if not targetHRP then return end
     hrp.CFrame = targetHRP.CFrame * CFrame.new(0, 3, 0)
     if WindUI then 
-        WindUI:Notify({
-            Title="FurqwkScripts", 
-            Content="Teleported to " .. target.Name, 
-            Duration=2, 
-            Icon="check"
-        }) 
+        pcall(function()
+            WindUI:Notify({
+                Title="FurqwkScripts", 
+                Content="Teleported to " .. target.Name, 
+                Duration=2, 
+                Icon="check"
+            })
+        end)
     end
 end
 
 local function TeleportToMap()
     local char = player.Character
     if not char then 
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Character not found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Character not found!", Duration=2, Icon="warning"}) end) end
         return 
     end
 
     local map = getMap()
     if not map then 
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Map not found! Trying to find spawn...", Duration=2, Icon="warning"}) end
-        -- Try to find any spawn point in workspace
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Map not found! Trying to find spawn...", Duration=2, Icon="warning"}) end) end
         for _, obj in ipairs(workspace:GetDescendants()) do
             if obj:IsA("BasePart") and (obj.Name:lower():find("spawn") or obj.Name:lower():find("start")) then
                 local hrp = char:FindFirstChild("HumanoidRootPart")
                 if hrp then
                     hrp.CFrame = obj.CFrame * CFrame.new(0, 3, 0)
-                    if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Teleported to spawn point!", Duration=2, Icon="check"}) end
+                    if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Teleported to spawn point!", Duration=2, Icon="check"}) end) end
                     return
                 end
             end
@@ -994,13 +993,13 @@ local function TeleportToMap()
 
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="HRP not found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="HRP not found!", Duration=2, Icon="warning"}) end) end
         return
     end
 
     local spawns = map:FindFirstChild("Spawns")
     if not spawns then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Spawns not found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Spawns not found!", Duration=2, Icon="warning"}) end) end
         return
     end
 
@@ -1012,39 +1011,39 @@ local function TeleportToMap()
     end
 
     if #spawnParts == 0 then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="No spawn parts found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="No spawn parts found!", Duration=2, Icon="warning"}) end) end
         return
     end
 
     local spawn = spawnParts[math.random(1, #spawnParts)]
     if spawn and spawn:IsA("BasePart") then
         hrp.CFrame = spawn.CFrame * CFrame.new(0, 3, 0)
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Teleported to map!", Duration=2, Icon="check"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Teleported to map!", Duration=2, Icon="check"}) end) end
     end
 end
 
 local function TeleportToLobby()
     local char = player.Character
     if not char then 
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Character not found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Character not found!", Duration=2, Icon="warning"}) end) end
         return 
     end
 
     local lobby = getLobby()
     if not lobby then 
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Lobby not found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Lobby not found!", Duration=2, Icon="warning"}) end) end
         return 
     end
 
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="HRP not found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="HRP not found!", Duration=2, Icon="warning"}) end) end
         return
     end
 
     local spawns = lobby:FindFirstChild("Spawns") or lobby:FindFirstChild("LobbySpawns")
     if not spawns then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Spawns not found in lobby!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Spawns not found in lobby!", Duration=2, Icon="warning"}) end) end
         return
     end
 
@@ -1056,33 +1055,37 @@ local function TeleportToLobby()
     end
 
     if #spawnParts == 0 then
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="No spawn parts found!", Duration=2, Icon="warning"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="No spawn parts found!", Duration=2, Icon="warning"}) end) end
         return
     end
 
     local spawn = spawnParts[math.random(1, #spawnParts)]
     if spawn and spawn:IsA("BasePart") then
         hrp.CFrame = spawn.CFrame * CFrame.new(0, 3, 0)
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Teleported to lobby!", Duration=2, Icon="check"}) end
+        if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Teleported to lobby!", Duration=2, Icon="check"}) end) end
     end
 end
 
 -- ============================================
 -- WORKSPACE LISTENERS
 -- ============================================
-Workspace.DescendantAdded:Connect(function(obj)
-    if obj.Name == "GunDrop" then
-        if gunDropESP then createGunDropHighlight(obj) end
-        if autoGetDroppedGun then task.spawn(function() task.wait(1); grabGun() end) end
-    end
-    if espEnabled.trap and isTrap(obj) then task.wait(0.1); addTrapHighlight(obj) end
+pcall(function()
+    Workspace.DescendantAdded:Connect(function(obj)
+        if obj.Name == "GunDrop" then
+            if gunDropESP then createGunDropHighlight(obj) end
+            if autoGetDroppedGun then task.spawn(function() task.wait(1); grabGun() end) end
+        end
+        if espEnabled.trap and isTrap(obj) then task.wait(0.1); addTrapHighlight(obj) end
+    end)
 end)
 
-Workspace.DescendantRemoving:Connect(function(obj)
-    if obj.Name == "GunDrop" then
-        for i,v in pairs(gunDropHighlights) do if v and v.Parent==obj then v:Destroy(); gunDropHighlights[i]=nil end end
-        for i,v in pairs(gunDropLabels)     do if v and v.Parent==obj then v:Destroy(); gunDropLabels[i]=nil     end end
-    end
+pcall(function()
+    Workspace.DescendantRemoving:Connect(function(obj)
+        if obj.Name == "GunDrop" then
+            for i,v in pairs(gunDropHighlights) do if v and v.Parent==obj then v:Destroy(); gunDropHighlights[i]=nil end end
+            for i,v in pairs(gunDropLabels)     do if v and v.Parent==obj then v:Destroy(); gunDropLabels[i]=nil     end end
+        end
+    end)
 end)
 
 -- ============================================
@@ -1183,50 +1186,86 @@ task.spawn(function()
 end)
 
 -- ============================================
--- LOAD WINDUI
+-- LOAD WINDUI - WITH ERROR HANDLING
 -- ============================================
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local WindUI = nil
+local success, err = pcall(function()
+    WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+end)
 
-WindUI:AddTheme({
-    Name="Black Theme", 
-    Accent=Color3.fromRGB(0, 255, 0), 
-    Background=Color3.fromHex("#000000"),
-    Outline=Color3.fromHex("#1a1a1a"), 
-    Text=Color3.fromHex("#ffffff"),
-    Placeholder=Color3.fromHex("#4d4d4d"), 
-    Button=Color3.fromHex("#0a0a0a"), 
-    Icon=Color3.fromHex("#808080"),
-})
+if not success or not WindUI then
+    warn("Failed to load WindUI: " .. tostring(err))
+    return
+end
 
-WindUI:Popup({
-    Title="FurqwkScripts", Icon="info", Content="Script By Furqwk Scripts",
-    Buttons={
-        {Title="Cancel", Callback=function() end, Variant="Tertiary"},
-        {Title="Continue", Icon="arrow-right", Callback=function() end, Variant="Primary"}
-    }
-})
-WindUI:Notify({Title="FurqwkScripts", Content="Have Fun!", Duration=3, Icon="bird"})
+-- Define themes safely
+local function safeAddTheme()
+    pcall(function()
+        WindUI:AddTheme({
+            Name="Black Theme", 
+            Accent=Color3.fromRGB(0, 255, 0), 
+            Background=Color3.fromHex("#000000"),
+            Outline=Color3.fromHex("#1a1a1a"), 
+            Text=Color3.fromHex("#ffffff"),
+            Placeholder=Color3.fromHex("#4d4d4d"), 
+            Button=Color3.fromHex("#0a0a0a"), 
+            Icon=Color3.fromHex("#808080"),
+        })
+    end)
+end
 
-local Window = WindUI:CreateWindow({
-    Title="FurqwkScripts Hub", Icon="door-open", Author="by FurqwkScripts",
-    Folder="FurqwkScriptsHub", Size=UDim2.fromOffset(580,460),
-    MinSize=Vector2.new(560,350), MaxSize=Vector2.new(850,560),
-    ToggleKey=Enum.KeyCode.LeftShift, Transparent=true, Theme="Black Theme",
-    Resizable=true, SideBarWidth=200, BackgroundImageTransparency=0.42,
-    HideSearchBar=true, ScrollBarEnabled=false,
-})
+safeAddTheme()
 
-Window:Tag({
-    Title = "YouTube: FurqwkScripts",
-    Icon = "youtube",
-    Color = Color3.fromRGB(255, 0, 0),
-    Radius = 0,
-})
+-- Safe popup
+pcall(function()
+    WindUI:Popup({
+        Title="FurqwkScripts", Icon="info", Content="Script By Furqwk Scripts",
+        Buttons={
+            {Title="Cancel", Callback=function() end, Variant="Tertiary"},
+            {Title="Continue", Icon="arrow-right", Callback=function() end, Variant="Primary"}
+        }
+    })
+end)
+
+pcall(function()
+    WindUI:Notify({Title="FurqwkScripts", Content="Have Fun!", Duration=3, Icon="bird"})
+end)
+
+local Window = nil
+pcall(function()
+    Window = WindUI:CreateWindow({
+        Title="FurqwkScripts Hub", Icon="door-open", Author="by FurqwkScripts",
+        Folder="FurqwkScriptsHub", Size=UDim2.fromOffset(580,460),
+        MinSize=Vector2.new(560,350), MaxSize=Vector2.new(850,560),
+        ToggleKey=Enum.KeyCode.LeftShift, Transparent=true, Theme="Black Theme",
+        Resizable=true, SideBarWidth=200, BackgroundImageTransparency=0.42,
+        HideSearchBar=true, ScrollBarEnabled=false,
+    })
+end)
+
+if not Window then
+    warn("Failed to create Window")
+    return
+end
+
+pcall(function()
+    Window:Tag({
+        Title = "YouTube: FurqwkScripts",
+        Icon = "youtube",
+        Color = Color3.fromRGB(255, 0, 0),
+        Radius = 0,
+    })
+end)
 
 -- ============================================
 -- TAB: AUTOFARM
 -- ============================================
-local AutofarmTab = Window:Tab({Title="Autofarm", Icon="tractor"})
+local AutofarmTab = nil
+pcall(function()
+    AutofarmTab = Window:Tab({Title="Autofarm", Icon="tractor"})
+end)
+
+if not AutofarmTab then return end
 
 local farmToggle = AutofarmTab:Toggle({
     Title="Auto Farm (Underground)", Desc="Toggle autofarm ON/OFF",
@@ -1275,347 +1314,404 @@ AutofarmTab:Keybind({Title="⌨ Keybind", Desc="Toggle autofarm", Value="G",
 -- ============================================
 -- TAB: PLAYER
 -- ============================================
-local PlayerTab = Window:Tab({Title="Player", Icon="user"})
+local PlayerTab = nil
+pcall(function()
+    PlayerTab = Window:Tab({Title="Player", Icon="user"})
+end)
 
-local noclipToggle = PlayerTab:Toggle({
-    Title="No Clip",
-    Desc="Toggle no clip through walls",
-    Icon="square",
-    Type="Checkbox",
-    Value=false,
-    Callback=function(state) setNoClip(state) end
-})
+if PlayerTab then
+    local noclipToggle = PlayerTab:Toggle({
+        Title="No Clip",
+        Desc="Toggle no clip through walls",
+        Icon="square",
+        Type="Checkbox",
+        Value=false,
+        Callback=function(state) setNoClip(state) end
+    })
 
-local flyToggle = PlayerTab:Toggle({
-    Title="Fly",
-    Desc="Toggle flying mode (WASD + Space/Shift)",
-    Icon="arrow-up",
-    Type="Checkbox",
-    Value=false,
-    Callback=function(state) toggleFly(state) end
-})
+    local flyToggle = PlayerTab:Toggle({
+        Title="Fly",
+        Desc="Toggle flying mode (WASD + Space/Shift)",
+        Icon="arrow-up",
+        Type="Checkbox",
+        Value=false,
+        Callback=function(state) toggleFly(state) end
+    })
 
-PlayerTab:Slider({
-    Title = "Fly Speed",
-    Desc = "Adjust fly speed (1-200)",
-    Step = 1,
-    Value = { Min = 1, Max = 200, Default = 50 },
-    Callback = function(value) flyspeedValue = value end
-})
+    PlayerTab:Slider({
+        Title = "Fly Speed",
+        Desc = "Adjust fly speed (1-200)",
+        Step = 1,
+        Value = { Min = 1, Max = 200, Default = 50 },
+        Callback = function(value) flyspeedValue = value end
+    })
 
-PlayerTab:Toggle({
-    Title="Anti Fling",
-    Desc="Prevents other players from flinging you",
-    Icon="shield",
-    Type="Checkbox",
-    Value=false,
-    Callback=function(state)
-        local conn = nil
-        if state then
-            conn = RunService.Heartbeat:Connect(function()
-                if character and rootPart then
-                    if rootPart.Velocity.Magnitude > 100 then
-                        rootPart.Velocity = rootPart.Velocity * 0.9
-                        if rootPart.Velocity.Magnitude > 500 then
-                            rootPart.Velocity = Vector3.new(0, 0, 0)
-                            local hum = character:FindFirstChild("Humanoid")
-                            if hum then hum.PlatformStand = false end
+    PlayerTab:Toggle({
+        Title="Anti Fling",
+        Desc="Prevents other players from flinging you",
+        Icon="shield",
+        Type="Checkbox",
+        Value=false,
+        Callback=function(state)
+            local conn = nil
+            if state then
+                conn = RunService.Heartbeat:Connect(function()
+                    if character and rootPart then
+                        if rootPart.Velocity.Magnitude > 100 then
+                            rootPart.Velocity = rootPart.Velocity * 0.9
+                            if rootPart.Velocity.Magnitude > 500 then
+                                rootPart.Velocity = Vector3.new(0, 0, 0)
+                                local hum = character:FindFirstChild("Humanoid")
+                                if hum then hum.PlatformStand = false end
+                            end
                         end
                     end
-                end
-            end)
-        else
-            if conn then conn:Disconnect() end
+                end)
+            else
+                if conn then conn:Disconnect() end
+            end
         end
-    end
-})
+    })
 
-PlayerTab:Slider({
-    Title = "Walk Speed",
-    Desc = "Adjust walk speed (1-100)",
-    Step = 1,
-    Value = { Min = 1, Max = 100, Default = 16 },
-    Callback = function(value)
-        local hum = character and character:FindFirstChild("Humanoid")
-        if hum then hum.WalkSpeed = value end
-    end
-})
+    PlayerTab:Slider({
+        Title = "Walk Speed",
+        Desc = "Adjust walk speed (1-100)",
+        Step = 1,
+        Value = { Min = 1, Max = 100, Default = 16 },
+        Callback = function(value)
+            local hum = character and character:FindFirstChild("Humanoid")
+            if hum then hum.WalkSpeed = value end
+        end
+    })
 
-PlayerTab:Button({
-    Title="🔄 Reset Walkspeed",
-    Desc="Reset walkspeed to 16",
-    Callback=function()
-        local hum = character and character:FindFirstChild("Humanoid")
-        if hum then hum.WalkSpeed = 16 end
-        if WindUI then WindUI:Notify({Title="FurqwkScripts", Content="Walk speed reset to 16!", Duration=2, Icon="refresh"}) end
-    end
-})
+    PlayerTab:Button({
+        Title="🔄 Reset Walkspeed",
+        Desc="Reset walkspeed to 16",
+        Callback=function()
+            local hum = character and character:FindFirstChild("Humanoid")
+            if hum then hum.WalkSpeed = 16 end
+            if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts", Content="Walk speed reset to 16!", Duration=2, Icon="refresh"}) end) end
+        end
+    })
 
-PlayerTab:Button({
-    Title="💀 Kill Character",
-    Desc="Kill your character (respawns)",
-    Callback=function()
-        local hum = character and character:FindFirstChild("Humanoid")
-        if hum then hum.Health = 0 end
-    end
-})
+    PlayerTab:Button({
+        Title="💀 Kill Character",
+        Desc="Kill your character (respawns)",
+        Callback=function()
+            local hum = character and character:FindFirstChild("Humanoid")
+            if hum then hum.Health = 0 end
+        end
+    })
+end
 
 -- ============================================
 -- TAB: ESP
 -- ============================================
-local ESPTab = Window:Tab({Title="ESP", Icon="eye"})
+local ESPTab = nil
+pcall(function()
+    ESPTab = Window:Tab({Title="ESP", Icon="eye"})
+end)
 
-ESPTab:Toggle({Title="Murderer ESP", Desc="Show players with KNIFE in RED",
-    Icon="skull", Type="Checkbox", Value=false,
-    Callback=function(state) espEnabled.murderer=state; updateESP() end})
-ESPTab:Toggle({Title="Sheriff ESP", Desc="Show players with GUN in BLUE",
-    Icon="shield", Type="Checkbox", Value=false,
-    Callback=function(state) espEnabled.sheriff=state; updateESP() end})
-ESPTab:Toggle({Title="Innocent ESP", Desc="Show players with NO WEAPON in GREEN",
-    Icon="users", Type="Checkbox", Value=false,
-    Callback=function(state) espEnabled.innocent=state; updateESP() end})
-ESPTab:Toggle({Title="Gun Drop ESP", Desc="Show dropped guns in YELLOW with label",
-    Icon="gun", Type="Checkbox", Value=false,
-    Callback=function(state) gunDropESP=state; setupGunDropESP() end})
-ESPTab:Toggle({Title="Trap ESP", Desc="Show murderer traps in ORANGE — bear traps, mines, floor traps",
-    Icon="alert-triangle", Type="Checkbox", Value=false,
-    Callback=function(state) espEnabled.trap=state; setupTrapESP() end})
-ESPTab:Button({Title="🔄 Refresh ESP", Desc="Manually refresh all highlights",
-    Callback=function() updateESP(); setupGunDropESP(); setupTrapESP() end})
+if ESPTab then
+    ESPTab:Toggle({Title="Murderer ESP", Desc="Show players with KNIFE in RED",
+        Icon="skull", Type="Checkbox", Value=false,
+        Callback=function(state) espEnabled.murderer=state; updateESP() end})
+    ESPTab:Toggle({Title="Sheriff ESP", Desc="Show players with GUN in BLUE",
+        Icon="shield", Type="Checkbox", Value=false,
+        Callback=function(state) espEnabled.sheriff=state; updateESP() end})
+    ESPTab:Toggle({Title="Innocent ESP", Desc="Show players with NO WEAPON in GREEN",
+        Icon="users", Type="Checkbox", Value=false,
+        Callback=function(state) espEnabled.innocent=state; updateESP() end})
+    ESPTab:Toggle({Title="Gun Drop ESP", Desc="Show dropped guns in YELLOW with label",
+        Icon="gun", Type="Checkbox", Value=false,
+        Callback=function(state) gunDropESP=state; setupGunDropESP() end})
+    ESPTab:Toggle({Title="Trap ESP", Desc="Show murderer traps in ORANGE — bear traps, mines, floor traps",
+        Icon="alert-triangle", Type="Checkbox", Value=false,
+        Callback=function(state) espEnabled.trap=state; setupTrapESP() end})
+    ESPTab:Button({Title="🔄 Refresh ESP", Desc="Manually refresh all highlights",
+        Callback=function() updateESP(); setupGunDropESP(); setupTrapESP() end})
+end
 
 -- ============================================
 -- TAB: SHERIFF
 -- ============================================
-local SheriffTab = Window:Tab({Title="Sheriff", Icon="shield"})
+local SheriffTab = nil
+pcall(function()
+    SheriffTab = Window:Tab({Title="Sheriff", Icon="shield"})
+end)
 
-SheriffTab:Toggle({Title="Show Gun Button", Desc="Floating grab gun button on screen",
-    Icon="circle", Type="Checkbox", Value=false,
-    Callback=function(state)
-        if state then
-            if gunBtn then gunBtn.destroy() end
-            gunBtn = makeCircleButton("GrabGunButton","Grab\nGun",UDim2.new(0.85,-27,0.40,0),grabGunManual)
-        else
-            if gunBtn then gunBtn.destroy(); gunBtn=nil end
-        end
-    end})
-SheriffTab:Toggle({Title="Lock Gun Button", Desc="Lock gun button — cannot be dragged while locked",
-    Icon="lock", Type="Checkbox", Value=false,
-    Callback=function(state) if gunBtn then gunBtn.setLocked(state) end end})
-SheriffTab:Toggle({Title="Auto Get Dropped Gun", Desc="Auto-grab dropped guns when they appear",
-    Icon="rocket", Type="Checkbox", Value=false,
-    Callback=function(state) autoGetDroppedGun=state; if state then task.spawn(function() grabGun() end) end end})
-SheriffTab:Button({Title="🔫 Grab Gun", Desc="Grab dropped gun and return to position",
-    Callback=function() grabGunManual() end})
-SheriffTab:Toggle({Title="Show Shoot Button", Desc="Floating shoot murderer button on screen",
-    Icon="crosshair", Type="Checkbox", Value=false,
-    Callback=function(state)
-        if state then
-            if shootBtn then shootBtn.destroy() end
-            shootBtn = makeCircleButton("ShootMurdButton","Shoot\nMurd",UDim2.new(0.85,-27,0.55,0),ShootMurderer)
-        else
-            if shootBtn then shootBtn.destroy(); shootBtn=nil end
-        end
-    end})
-SheriffTab:Toggle({Title="Lock Shoot Button", Desc="Lock shoot button position",
-    Icon="lock", Type="Checkbox", Value=false,
-    Callback=function(state) if shootBtn then shootBtn.setLocked(state) end end})
-SheriffTab:Button({Title="🎯 Shoot Murderer",
-    Desc="Shoots the murderer with prediction",
-    Callback=function() ShootMurderer() end})
-SheriffTab:Keybind({Title="Sheriff Keybind", Value="J", 
-    Callback=function() ShootMurderer() end})
+if SheriffTab then
+    SheriffTab:Toggle({Title="Show Gun Button", Desc="Floating grab gun button on screen",
+        Icon="circle", Type="Checkbox", Value=false,
+        Callback=function(state)
+            if state then
+                if gunBtn then gunBtn.destroy() end
+                gunBtn = makeCircleButton("GrabGunButton","Grab\nGun",UDim2.new(0.85,-27,0.40,0),grabGunManual)
+            else
+                if gunBtn then gunBtn.destroy(); gunBtn=nil end
+            end
+        end})
+    SheriffTab:Toggle({Title="Lock Gun Button", Desc="Lock gun button — cannot be dragged while locked",
+        Icon="lock", Type="Checkbox", Value=false,
+        Callback=function(state) if gunBtn then gunBtn.setLocked(state) end end})
+    SheriffTab:Toggle({Title="Auto Get Dropped Gun", Desc="Auto-grab dropped guns when they appear",
+        Icon="rocket", Type="Checkbox", Value=false,
+        Callback=function(state) autoGetDroppedGun=state; if state then task.spawn(function() grabGun() end) end end})
+    SheriffTab:Button({Title="🔫 Grab Gun", Desc="Grab dropped gun and return to position",
+        Callback=function() grabGunManual() end})
+    SheriffTab:Toggle({Title="Show Shoot Button", Desc="Floating shoot murderer button on screen",
+        Icon="crosshair", Type="Checkbox", Value=false,
+        Callback=function(state)
+            if state then
+                if shootBtn then shootBtn.destroy() end
+                shootBtn = makeCircleButton("ShootMurdButton","Shoot\nMurd",UDim2.new(0.85,-27,0.55,0),ShootMurderer)
+            else
+                if shootBtn then shootBtn.destroy(); shootBtn=nil end
+            end
+        end})
+    SheriffTab:Toggle({Title="Lock Shoot Button", Desc="Lock shoot button position",
+        Icon="lock", Type="Checkbox", Value=false,
+        Callback=function(state) if shootBtn then shootBtn.setLocked(state) end end})
+    SheriffTab:Button({Title="🎯 Shoot Murderer",
+        Desc="Shoots the murderer with prediction",
+        Callback=function() ShootMurderer() end})
+    SheriffTab:Keybind({Title="Sheriff Keybind", Value="J", 
+        Callback=function() ShootMurderer() end})
+end
 
 -- ============================================
 -- TAB: TELEPORTS
 -- ============================================
-local TeleportsTab = Window:Tab({Title="Teleports", Icon="map-pin"})
+local TeleportsTab = nil
+pcall(function()
+    TeleportsTab = Window:Tab({Title="Teleports", Icon="map-pin"})
+end)
 
-local RoleTeleportSection = TeleportsTab:Section({
-    Title = "Teleport to Role",
-    Box = false,
-    TextXAlignment = "Left",
-    Opened = true,
-})
+if TeleportsTab then
+    local RoleTeleportSection = TeleportsTab:Section({
+        Title = "Teleport to Role",
+        Box = false,
+        TextXAlignment = "Left",
+        Opened = true,
+    })
 
-RoleTeleportSection:Button({
-    Title = "🗡️ Teleport to Murderer",
-    Desc = "Teleports you directly to the murderer",
-    Icon = "skull",
-    Callback = function()
-        local m = getPlayerByRole("murderer")
-        if m then
-            TeleportToPlayer(m)
-        else
-            if WindUI then 
-                WindUI:Notify({
-                    Title="FurqwkScripts", 
-                    Content="No murderer found!", 
-                    Duration=2, 
-                    Icon="warning"
-                }) 
+    RoleTeleportSection:Button({
+        Title = "🗡️ Teleport to Murderer",
+        Desc = "Teleports you directly to the murderer",
+        Icon = "skull",
+        Callback = function()
+            local m = getPlayerByRole("murderer")
+            if m then
+                TeleportToPlayer(m)
+            else
+                if WindUI then 
+                    pcall(function()
+                        WindUI:Notify({
+                            Title="FurqwkScripts", 
+                            Content="No murderer found!", 
+                            Duration=2, 
+                            Icon="warning"
+                        })
+                    end)
+                end
             end
         end
-    end
-})
+    })
 
-RoleTeleportSection:Button({
-    Title = "🔫 Teleport to Sheriff",
-    Desc = "Teleports you directly to the sheriff",
-    Icon = "shield",
-    Callback = function()
-        local s = getPlayerByRole("sheriff")
-        if s then
-            TeleportToPlayer(s)
-        else
-            if WindUI then 
-                WindUI:Notify({
-                    Title="FurqwkScripts", 
-                    Content="No sheriff found!", 
-                    Duration=2, 
-                    Icon="warning"
-                }) 
+    RoleTeleportSection:Button({
+        Title = "🔫 Teleport to Sheriff",
+        Desc = "Teleports you directly to the sheriff",
+        Icon = "shield",
+        Callback = function()
+            local s = getPlayerByRole("sheriff")
+            if s then
+                TeleportToPlayer(s)
+            else
+                if WindUI then 
+                    pcall(function()
+                        WindUI:Notify({
+                            Title="FurqwkScripts", 
+                            Content="No sheriff found!", 
+                            Duration=2, 
+                            Icon="warning"
+                        })
+                    end)
+                end
             end
         end
-    end
-})
+    })
 
-local MapTeleportSection = TeleportsTab:Section({
-    Title = "Map Teleports",
-    Box = false,
-    TextXAlignment = "Left",
-    Opened = true,
-})
+    local MapTeleportSection = TeleportsTab:Section({
+        Title = "Map Teleports",
+        Box = false,
+        TextXAlignment = "Left",
+        Opened = true,
+    })
 
-MapTeleportSection:Button({
-    Title = "🗺️ Teleport to Map",
-    Desc = "Teleports you to the active map",
-    Icon = "map",
-    Callback = function() TeleportToMap() end
-})
+    MapTeleportSection:Button({
+        Title = "🗺️ Teleport to Map",
+        Desc = "Teleports you to the active map",
+        Icon = "map",
+        Callback = function() TeleportToMap() end
+    })
 
-MapTeleportSection:Button({
-    Title = "🏠 Teleport to Lobby",
-    Desc = "Teleports you back to the lobby",
-    Icon = "home",
-    Callback = function() TeleportToLobby() end
-})
+    MapTeleportSection:Button({
+        Title = "🏠 Teleport to Lobby",
+        Desc = "Teleports you back to the lobby",
+        Icon = "home",
+        Callback = function() TeleportToLobby() end
+    })
+end
 
 -- ============================================
 -- TAB: MURDERER
 -- ============================================
-local MurdererTab = Window:Tab({Title="Murderer", Icon="skull"})
+local MurdererTab = nil
+pcall(function()
+    MurdererTab = Window:Tab({Title="Murderer", Icon="skull"})
+end)
 
-local autoKillToggle = MurdererTab:Toggle({
-    Title="Auto Kill All (Touch)", 
-    Desc="Kill all players with knife using touch interest (no clicking)",
-    Icon="zap", 
-    Type="Checkbox", 
-    Value=false,
-    Callback=function(state) 
-        autoKillEnabled = state
-        if state then 
-            startAutoKillTouch() 
-        else 
-            stopAutoKill() 
+if MurdererTab then
+    local autoKillToggle = MurdererTab:Toggle({
+        Title="Auto Kill All (Touch)", 
+        Desc="Kill all players with knife using touch interest (no clicking)",
+        Icon="zap", 
+        Type="Checkbox", 
+        Value=false,
+        Callback=function(state) 
+            autoKillEnabled = state
+            if state then 
+                startAutoKillTouch() 
+            else 
+                stopAutoKill() 
+            end
         end
-    end
-})
+    })
 
-MurdererTab:Toggle({
-    Title="Show Kill All Button",
-    Desc="Show floating kill all button on screen",
-    Icon="sword",
-    Type="Checkbox",
-    Value=false,
-    Callback=function(state)
-        if state then
-            if killAllBtn then killAllBtn.destroy() end
-            killAllBtn = makeCircleButton("KillAllButton","Kill\nAll",UDim2.new(0.85,-27,0.70,0),killAllPlayers)
-        else
-            if killAllBtn then killAllBtn.destroy(); killAllBtn = nil end
+    MurdererTab:Toggle({
+        Title="Show Kill All Button",
+        Desc="Show floating kill all button on screen",
+        Icon="sword",
+        Type="Checkbox",
+        Value=false,
+        Callback=function(state)
+            if state then
+                if killAllBtn then killAllBtn.destroy() end
+                killAllBtn = makeCircleButton("KillAllButton","Kill\nAll",UDim2.new(0.85,-27,0.70,0),killAllPlayers)
+            else
+                if killAllBtn then killAllBtn.destroy(); killAllBtn = nil end
+            end
         end
-    end
-})
+    })
 
-MurdererTab:Toggle({
-    Title="Lock Kill All Button",
-    Desc="Lock kill all button position",
-    Icon="lock",
-    Type="Checkbox",
-    Value=false,
-    Callback=function(state) if killAllBtn then killAllBtn.setLocked(state) end end
-})
+    MurdererTab:Toggle({
+        Title="Lock Kill All Button",
+        Desc="Lock kill all button position",
+        Icon="lock",
+        Type="Checkbox",
+        Value=false,
+        Callback=function(state) if killAllBtn then killAllBtn.setLocked(state) end end
+    })
 
-MurdererTab:Button({
-    Title="⚔️ Kill All Now (Touch)", 
-    Desc="Instantly kills all players with knife using touch interest", 
-    Icon="sword",
-    Callback=function() killAllPlayers() end
-})
+    MurdererTab:Button({
+        Title="⚔️ Kill All Now (Touch)", 
+        Desc="Instantly kills all players with knife using touch interest", 
+        Icon="sword",
+        Callback=function() killAllPlayers() end
+    })
 
-MurdererTab:Keybind({Title="Murderer Keybind", Value="K", 
-    Callback=function()
-        autoKillToggle:SetValue(not autoKillEnabled)
-    end
-})
+    MurdererTab:Keybind({Title="Murderer Keybind", Value="K", 
+        Callback=function()
+            autoKillToggle:SetValue(not autoKillEnabled)
+        end
+    })
+end
 
 -- ============================================
 -- TAB: MISC
 -- ============================================
-local MiscTab = Window:Tab({Title="Misc", Icon="more-horizontal"})
+local MiscTab = nil
+pcall(function()
+    MiscTab = Window:Tab({Title="Misc", Icon="more-horizontal"})
+end)
 
--- FLING SECTION
-local FlingSection = MiscTab:Section({ 
-    Title = "Player Fling",
-    Box = false,
-    TextXAlignment = "Left",
-    Opened = true,
-})
-
-FlingSection:Button({Title="💨 Fling Murderer", Desc="Fling murderer out of map — you TP back after",
-    Callback=function()
-        local m = getPlayerByRole("murderer")
-        if m then 
-            SkidFling(m)
-            if WindUI then WindUI:Notify({Title="FurqwkScripts",Content="Murderer flung!",Duration=2,Icon="zap"}) end
-        else
-            if WindUI then WindUI:Notify({Title="FurqwkScripts",Content="No murderer found!",Duration=2,Icon="warning"}) end
+if MiscTab then
+    -- THEME DROPDOWN - WITH SAFE HANDLING
+    pcall(function()
+        local themeNames = WindUI:GetThemes()
+        if themeNames and #themeNames > 0 then
+            local ThemeDropdown = MiscTab:Dropdown({
+                Title = "Theme",
+                Values = themeNames,
+                Value = themeNames[1] or "Black Theme",
+                Callback = function(theme)
+                    pcall(function()
+                        WindUI:SetTheme(theme)
+                    end)
+                end,
+            })
         end
-    end})
+    end)
 
-FlingSection:Button({Title="💨 Fling Sheriff", Desc="Fling sheriff out of map — you TP back after",
-    Callback=function()
-        local s = getPlayerByRole("sheriff")
-        if s then 
-            SkidFling(s)
-            if WindUI then WindUI:Notify({Title="FurqwkScripts",Content="Sheriff flung!",Duration=2,Icon="zap"}) end
-        else
-            if WindUI then WindUI:Notify({Title="FurqwkScripts",Content="No sheriff found!",Duration=2,Icon="warning"}) end
-        end
-    end})
+    -- FLING SECTION
+    local FlingSection = MiscTab:Section({ 
+        Title = "Player Fling",
+        Box = false,
+        TextXAlignment = "Left",
+        Opened = true,
+    })
 
-FlingSection:Button({Title="💨 Fling All", Desc="Fling all players in the server",
-    Callback=function()
-        local count = 0
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= player and p.Character then
-                SkidFling(p)
-                count = count + 1
-                task.wait(0.1)
+    FlingSection:Button({Title="💨 Fling Murderer", Desc="Fling murderer out of map — you TP back after",
+        Callback=function()
+            local m = getPlayerByRole("murderer")
+            if m then 
+                SkidFling(m)
+                if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts",Content="Murderer flung!",Duration=2,Icon="zap"}) end) end
+            else
+                if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts",Content="No murderer found!",Duration=2,Icon="warning"}) end) end
             end
-        end
-        if WindUI then 
-            WindUI:Notify({
-                Title="FurqwkScripts",
-                Content="Flinged " .. count .. " players!",
-                Duration=2,
-                Icon="zap"
-            }) 
-        end
-    end})
+        end})
+
+    FlingSection:Button({Title="💨 Fling Sheriff", Desc="Fling sheriff out of map — you TP back after",
+        Callback=function()
+            local s = getPlayerByRole("sheriff")
+            if s then 
+                SkidFling(s)
+                if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts",Content="Sheriff flung!",Duration=2,Icon="zap"}) end) end
+            else
+                if WindUI then pcall(function() WindUI:Notify({Title="FurqwkScripts",Content="No sheriff found!",Duration=2,Icon="warning"}) end) end
+            end
+        end})
+
+    FlingSection:Button({Title="💨 Fling All", Desc="Fling all players in the server",
+        Callback=function()
+            local count = 0
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= player and p.Character then
+                    SkidFling(p)
+                    count = count + 1
+                    task.wait(0.1)
+                end
+            end
+            if WindUI then 
+                pcall(function()
+                    WindUI:Notify({
+                        Title="FurqwkScripts",
+                        Content="Flinged " .. count .. " players!",
+                        Duration=2,
+                        Icon="zap"
+                    })
+                end)
+            end
+        end})
+end
 
 -- ============================================
 -- SELECT FIRST TAB
 -- ============================================
 task.wait(0.5)
-pcall(function() Window:SelectTab(AutofarmTab) end)
+pcall(function() 
+    if Window and AutofarmTab then
+        Window:SelectTab(AutofarmTab) 
+    end
+end)
