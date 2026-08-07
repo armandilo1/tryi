@@ -1777,16 +1777,20 @@ local function fitSize()
     local vp = Camera.ViewportSize
 
     if IS_MOBILE then
-        -- Was 0.92 x 0.78 of the screen, capped at 540x440 - which is nearly
-        -- the whole display on a phone, and that is what made it feel huge.
-        -- Two thirds wide by just over half tall leaves the game visible around
-        -- it, and the Home slider moves it from here.
-        -- Floors kept low on purpose. On a small viewport the old 540/440 caps
-        -- were never reached by the percentage - the FLOOR was what pinned the
-        -- window wide open. Low floors let the percentage actually govern.
+        -- Width and height are set from different goals, so they get different
+        -- fractions.
+        --
+        -- WIDTH is what made it feel oversized: 0.92 of the screen left almost
+        -- no game visible around it. 0.78 reads as a window sitting on top of
+        -- the game rather than replacing it.
+        --
+        -- HEIGHT is not a cosmetic choice - it is what decides how many tabs
+        -- you can see. Ten tabs at WindUI's ~32px row need ~320px of sidebar
+        -- before the header is counted, so squeezing the height is exactly
+        -- what hid ESP, Fling, Player, Misc and Settings. It goes UP, not down.
         return UDim2.fromOffset(
-            math.clamp(math.floor(vp.X * 0.66 * windowScale), 240, 460),
-            math.clamp(math.floor(vp.Y * 0.55 * windowScale), 200, 400)
+            math.clamp(math.floor(vp.X * 0.78 * windowScale), 280, 500),
+            math.clamp(math.floor(vp.Y * 0.88 * windowScale), 300, 520)
         )
     end
 
@@ -1843,7 +1847,9 @@ Window = WindUI:CreateWindow({
     -- MinSize has to sit below what the slider can ask for, or WindUI clamps
     -- the small end back up and the slider appears to do nothing.
     MinSize = IS_MOBILE and Vector2.new(230, 190) or Vector2.new(540, 400),
-    MaxSize = IS_MOBILE and Vector2.new(600, 500) or Vector2.new(820, 600),
+    -- Height raised from 500: fitSize can now ask for up to 520 for the tab
+    -- list, and MaxSize would have silently clamped it back down.
+    MaxSize = IS_MOBILE and Vector2.new(620, 560) or Vector2.new(820, 600),
 
     -- Touch needs a narrower sidebar or the content column disappears.
     SideBarWidth  = IS_MOBILE and 112 or 190,
@@ -1862,7 +1868,10 @@ Window = WindUI:CreateWindow({
     Transparent = false,
     ToggleKey   = Enum.KeyCode.Q,
 
-    User = { Enabled = true, Anonymous = false },
+    -- The avatar card sits at the BOTTOM of the sidebar, below the tabs, and
+    -- eats roughly two tabs' worth of height. On a phone that space is better
+    -- spent showing Misc and Settings than showing you your own username.
+    User = { Enabled = not IS_MOBILE, Anonymous = false },
 })
 
 Window:Tag({ Title = "Youtube: FurqwkScripts", Icon = "youtube", Color = Color3.fromHex("#ff0000") })
@@ -2185,7 +2194,9 @@ end
 if IS_MOBILE then
     Section(HomeTab, "Window")
 
-    Slider(HomeTab, "win_scale", "Window Size", nil, 60, 130, 100, 5, function(value)
+    -- Starts at 100 = the fitted size. Range is deliberately narrow and centred:
+    -- going far below 100 is what buries the lower tabs again.
+    Slider(HomeTab, "win_scale", "Window Size", nil, 80, 120, 100, 5, function(value)
         windowScale = value / 100
         pcall(function() Window:SetSize(fitSize()) end)
     end)
